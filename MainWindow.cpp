@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         m_soundDevice->loadFile(args[1]);
     }
+    m_soundDevice->setTempo(0.2);
 }
 
 MainWindow::~MainWindow()

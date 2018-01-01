@@ -3,7 +3,9 @@
 
 #include <QAudioOutput>
 #include <QIODevice>
+#include <QVector>
 #include "AudioFile.h"
+#include "soundtouch/SoundTouch.h"
 
 class SoundDevice : public QIODevice
 {
@@ -15,6 +17,8 @@ public:
 
 
     void setPlaying(bool v);
+
+    void setTempo(double v);
 
 
 
@@ -30,17 +34,20 @@ private:
 
     bool m_isPlaying;
     QAudioOutput *m_audioOutput;
+    soundtouch::SoundTouch m_processor;
+    QVector<float> m_sampleCache;
+    double m_tempo;
 
 
 signals:
-    void aboutToStop();
+//    void aboutToStop();
 
 //    // QIODevice interface
 //public:
 //    bool atEnd() const;
 
-//private slots:
-//    void audioOutputStateChanged(QAudio::State newState);
+private slots:
+    void audioOutputStateChanged(QAudio::State newState);
 };
 
 #endif // SOUNDDEVICE_H
