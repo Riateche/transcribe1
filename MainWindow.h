@@ -23,6 +23,14 @@ private slots:
 
     void on_openFile_triggered();
 
+    void on_start_clicked();
+
+    void on_stop_clicked();
+
+    void on_togglePause_toggled(bool checked);
+
+    void on_goToStart_clicked();
+
 private:
     Ui::MainWindow *ui;
     SoundDevice *m_soundDevice;

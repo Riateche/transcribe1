@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         m_soundDevice->loadFile(args[1]);
     }
-    m_soundDevice->setTempo(0.2);
+    m_soundDevice->setTempo(5);
 }
 
 MainWindow::~MainWindow()
@@ -31,7 +31,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_test1_toggled(bool checked)
 {
-    m_soundDevice->setPlaying(checked);
+    if (checked) {
+        m_soundDevice->start();
+    } else {
+        m_soundDevice->stop();
+    }
 }
 
 void MainWindow::on_openFile_triggered()
@@ -43,4 +47,28 @@ void MainWindow::on_openFile_triggered()
         return;
     }
     m_soundDevice->loadFile(fileName);
+}
+
+void MainWindow::on_start_clicked()
+{
+    m_soundDevice->start();
+}
+
+void MainWindow::on_stop_clicked()
+{
+    m_soundDevice->stop();
+}
+
+void MainWindow::on_togglePause_toggled(bool checked)
+{
+    if (checked) {
+        m_soundDevice->pause();
+    } else {
+        m_soundDevice->resume();
+    }
+}
+
+void MainWindow::on_goToStart_clicked()
+{
+    //...
 }

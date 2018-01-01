@@ -3,14 +3,13 @@
 #include <QtMath>
 #include <QDebug>
 #include <QAudioFormat>
+#include <QBuffer>
 
 
 SoundDevice::SoundDevice(QObject *parent) : QIODevice(parent)
 {
-    m_audioFile = nullptr;
     m_numSamples = 0;
     m_pos = 0;
-    m_isPlaying = false;
     m_tempo = 1.0;
 
     m_audioOutput = nullptr;
@@ -21,16 +20,25 @@ void SoundDevice::loadFile(const QString &filePath)
     if (m_audioOutput) {
         delete m_audioOutput;
     }
-    m_audioFile = new AudioFile<float>();
-    m_audioFile->load(filePath.toStdString());
-    m_numChannels = m_audioFile->getNumChannels();
-    m_numSamples = m_audioFile->getNumSamplesPerChannel();
+
+    AudioFile<float> audioFile;
+    audioFile.load(filePath.toStdString());
+    m_numChannels = audioFile.getNumChannels();
+    m_numSamples = audioFile.getNumSamplesPerChannel();
+    QVector<float> data(m_numChannels * m_numSamples);
+    for (qint64 i = 0; i < m_numSamples; i++) {
+        for (int ch = 0; ch < m_numChannels; ch++) {
+            data[i * m_numChannels + ch] = audioFile.samples[ch][i];
+        }
+    }
+    m_samples.setData(reinterpret_cast<char*>(data.data()), m_numChannels * m_numSamples * sizeof(float));
+    m_samples.open(QBuffer::ReadOnly);
+
     m_pos = 0;
-    m_isPlaying = false;
 
     QAudioFormat format;
     format.setChannelCount(m_numChannels);
-    format.setSampleRate(m_audioFile->getSampleRate());
+    format.setSampleRate(audioFile.getSampleRate());
     format.setSampleSize(sizeof(float) * 8);
     format.setSampleType(QAudioFormat::Float);
     format.setCodec("audio/pcm");
@@ -38,8 +46,8 @@ void SoundDevice::loadFile(const QString &filePath)
     m_audioOutput = new QAudioOutput(format);
 
     m_processor.setChannels(m_numChannels);
-    m_processor.setSampleRate(m_audioFile->getSampleRate());
-    //m_processor.setPitch(0.25);
+    m_processor.setSampleRate(audioFile.getSampleRate());
+    m_processor.setPitch(1);
     m_processor.clear();
 
 
@@ -50,19 +58,6 @@ void SoundDevice::loadFile(const QString &filePath)
     open(ReadOnly);
 }
 
-void SoundDevice::setPlaying(bool v)
-{
-    if (m_isPlaying == v) {
-        return;
-    }
-    m_isPlaying = v;
-    if (m_isPlaying) {
-        m_audioOutput->start(this);
-        qDebug() << m_audioOutput->state() << m_audioOutput->error();
-    } else {
-        //emit aboutToStop();
-    }
-}
 
 void SoundDevice::setTempo(double v)
 {
@@ -74,52 +69,59 @@ void SoundDevice::setTempo(double v)
     m_processor.clear();
 }
 
+void SoundDevice::start()
+{
+    m_audioOutput->start(this);
+    qDebug() << m_audioOutput->state() << m_audioOutput->error();
+}
+
+void SoundDevice::stop()
+{
+    qDebug() << "stopped";
+    m_processor.clear();
+    m_audioOutput->stop();
+}
+
+void SoundDevice::pause()
+{
+    m_audioOutput->suspend();
+}
+
+void SoundDevice::resume()
+{
+    m_audioOutput->resume();
+}
+
 
 qint64 SoundDevice::readData(char *data, qint64 maxlen)
 {
-    if (!m_audioFile) {
-        return -1;
-    }
-    if (!m_isPlaying) {
+    if (!m_samples.isOpen()) {
         return -1;
     }
 
     qint64 sampleSize = sizeof(float) * m_numChannels;
-    qint64 realSamples = qMin(static_cast<qint64>(qFloor(m_tempo * maxlen / sampleSize)), m_numSamples - m_pos);
-//    if (realSamples <= 0) {
 
+    qint64 requestedSamples = maxlen / sampleSize;
 
-
-//        setPlaying(false);
-//        return -1;
-//    }
-    if (realSamples > 0) {
-        m_sampleCache.resize(realSamples);
-        for (qint64 i = 0; i < realSamples; i++) {
-            for (int ch = 0; ch < m_numChannels; ch++) {
-                m_sampleCache[i * m_numChannels + ch] = m_audioFile->samples[ch][i + m_pos];
-            }
-        }
-        //memcpy(data, m_sampleCache.data(), realSamples * sampleSize);
-
-        m_processor.putSamples(m_sampleCache.data(), realSamples);
-        m_pos += realSamples;
-        //return realSamples * sampleSize;
-    } else {
-        m_processor.flush();
-        //setPlaying(false);
+    while (!m_samples.atEnd() && (m_processor.numSamples() < requestedSamples))
+    {
+        char buf[4096];
+        qint64 size = m_samples.read(buf, sizeof(buf));
+        m_processor.putSamples(reinterpret_cast<float*>(&buf), size / sampleSize);
     }
-    qint64 outputSamples = m_processor.receiveSamples(reinterpret_cast<float*>(data),
-                                                      static_cast<uint>(maxlen / sampleSize));
-    if (outputSamples == 0 && realSamples <= 0) {
-        //setPlaying(false);
+    if (m_samples.atEnd())
+    {
+        m_processor.flush();
+    }
+
+    if (m_processor.numUnprocessedSamples() == 0) {
         return -1;
     }
-    qDebug() << "real:" << realSamples << " output:" << outputSamples;
 
-    // reinterpret_cast<float*>(data)[i * m_numChannels + ch] = m_audioFile->samples[ch][i + m_pos];
-    qint64 len = outputSamples * sampleSize;
-    return len;
+    qint64 outputSamples = m_processor.receiveSamples(reinterpret_cast<float*>(data),
+                                                      static_cast<uint>(maxlen / sampleSize));
+    qDebug() << "numSamples =" << m_processor.numSamples() << "numUnprocessedSamples =" << m_processor.numUnprocessedSamples();
+    return outputSamples * sampleSize;
 }
 
 qint64 SoundDevice::writeData(const char *data, qint64 len)
@@ -133,8 +135,7 @@ qint64 SoundDevice::writeData(const char *data, qint64 len)
 void SoundDevice::audioOutputStateChanged(QAudio::State newState)
 {
     if (newState == QAudio::IdleState) {
-        m_audioOutput->stop();
-        m_isPlaying = false;
+        stop();
     }
 }
 
