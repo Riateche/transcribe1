@@ -5,6 +5,7 @@
 #include <QAudioOutput>
 #include <QBuffer>
 #include <QDebug>
+#include <QFileDialog>
 #include "SoundDevice.h"
 
 using namespace soundtouch;
@@ -14,12 +15,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    //auto soundTouch = new SoundTouch();
-    //soundTouch->
-
-    //qDebug() << audioFile->samples[0][100] << audioFile->samples[0][101] << audioFile->samples[0][102] << audioFile->samples[0][103];
     m_soundDevice = new SoundDevice();
-    m_soundDevice->loadFile("/home/ri/tmp/1.wav");
+    auto args = qApp->arguments();
+    if (args.size() > 1)
+    {
+        m_soundDevice->loadFile(args[1]);
+    }
 }
 
 MainWindow::~MainWindow()
@@ -30,4 +31,15 @@ MainWindow::~MainWindow()
 void MainWindow::on_test1_toggled(bool checked)
 {
     m_soundDevice->setPlaying(checked);
+}
+
+void MainWindow::on_openFile_triggered()
+{
+    auto fileName = QFileDialog::getOpenFileName(this,
+        tr("Open sound file"), "", tr("Cool sounds (*.wav)"));
+    if (fileName.isEmpty())
+    {
+        return;
+    }
+    m_soundDevice->loadFile(fileName);
 }

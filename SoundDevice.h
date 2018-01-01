@@ -22,17 +22,25 @@ private:
     qint64 readData(char *data, qint64 maxlen);
     qint64 writeData(const char *data, qint64 len);
 
+
     AudioFile<float>* m_audioFile;
     qint64 m_pos;
+    int m_numChannels;
     qint64 m_numSamples;
 
-    //const qint64 READ_SIZE = 512;
-
-    bool m_wasStarted;
     bool m_isPlaying;
     QAudioOutput *m_audioOutput;
 
 
+signals:
+    void aboutToStop();
+
+//    // QIODevice interface
+//public:
+//    bool atEnd() const;
+
+//private slots:
+//    void audioOutputStateChanged(QAudio::State newState);
 };
 
 #endif // SOUNDDEVICE_H

@@ -21,6 +21,8 @@ public:
 private slots:
     void on_test1_toggled(bool checked);
 
+    void on_openFile_triggered();
+
 private:
     Ui::MainWindow *ui;
     SoundDevice *m_soundDevice;
