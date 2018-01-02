@@ -72,3 +72,18 @@ void MainWindow::on_goToStart_clicked()
 {
     //...
 }
+
+void MainWindow::on_speed25_toggled(bool checked)
+{
+    if (checked) m_soundDevice->setTempo(0.25);
+}
+
+void MainWindow::on_speed50_toggled(bool checked)
+{
+    if (checked) m_soundDevice->setTempo(0.5);
+}
+
+void MainWindow::on_speed100_toggled(bool checked)
+{
+    if (checked) m_soundDevice->setTempo(1.0);
+}

@@ -31,6 +31,12 @@ private slots:
 
     void on_goToStart_clicked();
 
+    void on_speed25_toggled(bool checked);
+
+    void on_speed50_toggled(bool checked);
+
+    void on_speed100_toggled(bool checked);
+
 private:
     Ui::MainWindow *ui;
     SoundDevice *m_soundDevice;
