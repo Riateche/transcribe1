@@ -37,9 +37,12 @@ void AudioWaveWidget::setAudioData(const AudioData *audioData)
         {
             m_amplitudeScale = 1.0f;
         }
-        qDebug() << "m_amplitudeScale=" << m_amplitudeScale;
 
-        m_samplesPerPixel = m_audioData->numSamples() / width();
+        float secondsPerPixel = 1.0f / 100; // one second per 100 pixels
+        m_samplesPerPixel = secondsPerPixel * m_audioData->sampleRate();
+
+        int totalPixels = m_audioData->numSamples() / (float)m_samplesPerPixel + 1;
+        if (totalPixels > width()) resize(totalPixels, height());
     }
     update();
 }
@@ -59,11 +62,12 @@ void AudioWaveWidget::paintEvent(QPaintEvent *event)
     qDebug() << rect;
     if (m_audioData->numChannels() == 2)
     {
-        int spacing = 10;
+        int spacing = rect.height() / 20;
         int partHeight = (rect.height() - spacing) / 2;
         rect.setHeight(partHeight);
         drawWave(painter, rect, 0);
         rect.setY(partHeight + spacing);
+        rect.setHeight(partHeight);
         drawWave(painter, rect, 1);
     }
     else
@@ -74,6 +78,7 @@ void AudioWaveWidget::paintEvent(QPaintEvent *event)
 
 void AudioWaveWidget::drawWave(QPainter &painter, const QRect &rect, int channel)
 {
+    qDebug() << "drawWave: " << rect;
     QPen pen(Qt::darkGreen);
     painter.setPen(pen);
     for (int i = 0; i < rect.width(); i++)
@@ -102,6 +107,6 @@ void AudioWaveWidget::drawWave(QPainter &painter, const QRect &rect, int channel
         int yc = rect.height() / 2;
         int y1 = yc - (avgPos * rect.height() / 2);
         int y2 = yc + (avgNeg * rect.height() / 2);
-        painter.drawLine(rect.x()+i, y1, rect.x()+i, y2);
+        painter.drawLine(rect.x()+i, rect.y()+y1, rect.x()+i, rect.y()+y2);
     }
 }
