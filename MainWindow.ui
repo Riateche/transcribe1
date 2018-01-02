@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>515</width>
     <height>300</height>
    </rect>
   </property>
@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="start">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>50</y>
+      <x>20</x>
+      <y>20</y>
       <width>82</width>
       <height>23</height>
      </rect>
@@ -26,18 +26,19 @@
     <property name="text">
      <string>Start</string>
     </property>
-    <property name="checkable">
-     <bool>false</bool>
+    <property name="icon">
+     <iconset resource="resources.qrc">
+      <normaloff>:/icons/media-playback-start-symbolic.symbolic.png</normaloff>:/icons/media-playback-start-symbolic.symbolic.png</iconset>
     </property>
-    <property name="checked">
-     <bool>false</bool>
+    <property name="checkable">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QPushButton" name="stop">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>50</y>
+      <x>110</x>
+      <y>20</y>
       <width>82</width>
       <height>23</height>
      </rect>
@@ -45,18 +46,26 @@
     <property name="text">
      <string>Stop</string>
     </property>
+    <property name="icon">
+     <iconset resource="resources.qrc">
+      <normaloff>:/icons/media-playback-stop-symbolic.symbolic.png</normaloff>:/icons/media-playback-stop-symbolic.symbolic.png</iconset>
+    </property>
    </widget>
    <widget class="QPushButton" name="togglePause">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>130</y>
+      <x>200</x>
+      <y>20</y>
       <width>82</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
      <string>Pause</string>
+    </property>
+    <property name="icon">
+     <iconset resource="resources.qrc">
+      <normaloff>:/icons/media-playback-pause-symbolic.symbolic.png</normaloff>:/icons/media-playback-pause-symbolic.symbolic.png</iconset>
     </property>
     <property name="checkable">
      <bool>true</bool>
@@ -65,14 +74,18 @@
    <widget class="QPushButton" name="goToStart">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>130</y>
-      <width>82</width>
+      <x>290</x>
+      <y>20</y>
+      <width>111</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
      <string>Go to start</string>
+    </property>
+    <property name="icon">
+     <iconset resource="resources.qrc">
+      <normaloff>:/icons/media-skip-forward-symbolic-rtl.symbolic.png</normaloff>:/icons/media-skip-forward-symbolic-rtl.symbolic.png</iconset>
     </property>
    </widget>
   </widget>
@@ -81,8 +94,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>400</width>
-     <height>20</height>
+     <width>515</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -109,6 +122,8 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

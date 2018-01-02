@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/media-playback-pause.png</file>
+        <file>icons/media-playback-pause-symbolic.symbolic.png</file>
+        <file>icons/media-playback-start.png</file>
+        <file>icons/media-playback-start-symbolic.symbolic.png</file>
+        <file>icons/media-playback-stop.png</file>
+        <file>icons/media-playback-stop-symbolic.symbolic.png</file>
+        <file>icons/media-skip-forward-rtl.png</file>
+        <file>icons/media-skip-forward-symbolic-rtl.symbolic.png</file>
+    </qresource>
+</RCC>
