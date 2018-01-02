@@ -74,12 +74,7 @@ void AudioWaveWidget::paintEvent(QPaintEvent *event)
 
 void AudioWaveWidget::drawWave(QPainter &painter, const QRect &rect, int channel)
 {
-    QPen pen(Qt::darkGray);
-    painter.setPen(pen);
-    painter.drawLine(rect.x(), rect.y() + rect.height()/2,
-                     rect.x() + rect.width(), rect.y() + rect.height()/2);
-
-    pen.setColor(Qt::darkGreen);
+    QPen pen(Qt::darkGreen);
     painter.setPen(pen);
     for (int i = 0; i < rect.width(); i++)
     {
