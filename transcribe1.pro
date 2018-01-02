@@ -27,12 +27,14 @@ SOURCES += \
         main.cpp \
         MainWindow.cpp \
     AudioFile.cpp \
-    SoundDevice.cpp
+    SoundDevice.cpp \
+    AudioData.cpp
 
 HEADERS += \
         MainWindow.h \
     AudioFile.h \
-    SoundDevice.h
+    SoundDevice.h \
+    AudioData.h
 
 FORMS += \
         MainWindow.ui

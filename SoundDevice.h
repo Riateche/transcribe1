@@ -5,7 +5,7 @@
 #include <QBuffer>
 #include <QIODevice>
 #include <QVector>
-#include "AudioFile.h"
+#include "AudioData.h"
 #include "soundtouch/SoundTouch.h"
 
 class SoundDevice : public QIODevice
@@ -15,6 +15,7 @@ public:
     explicit SoundDevice(QObject *parent = nullptr);
 
     void loadFile(const QString& filePath);
+    const AudioData* audioData() const;
 
 
     void setTempo(double v);
@@ -31,11 +32,7 @@ private:
     qint64 writeData(const char *data, qint64 len);
 
 
-
-    QBuffer m_samples;
-    qint64 m_pos;
-    int m_numChannels;
-    qint64 m_numSamples;
+    AudioData m_audioData;
 
     //bool m_isPlaying;
     QAudioOutput *m_audioOutput;
