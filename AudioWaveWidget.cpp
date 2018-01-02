@@ -31,7 +31,7 @@ void AudioWaveWidget::setAudioData(const AudioData *audioData)
 
         if (stddev > 0.0001)
         {
-            m_amplitudeScale = 1.0f / (2*stddev);
+            m_amplitudeScale = 1.0f / (3*stddev);
         }
         else
         {
