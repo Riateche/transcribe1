@@ -20,8 +20,9 @@ MainWindow::MainWindow(QWidget *parent) :
     if (args.size() > 1)
     {
         m_soundDevice->loadFile(args[1]);
+        ui->wave->setAudioData(m_soundDevice->audioData());
     }
-    m_soundDevice->setTempo(5);
+    //m_soundDevice->setTempo(5);
 }
 
 MainWindow::~MainWindow()
@@ -47,6 +48,7 @@ void MainWindow::on_openFile_triggered()
         return;
     }
     m_soundDevice->loadFile(fileName);
+    ui->wave->setAudioData(m_soundDevice->audioData());
 }
 
 void MainWindow::on_start_clicked()

@@ -17,7 +17,7 @@ public:
     int sampleRate() const;
     int numSamples() const;
 
-    float operator()(int channel, int sample) const;
+    float sample(int channel, int sampleIndex) const;
 
 private:
     QString m_filePath;

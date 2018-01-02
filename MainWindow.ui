@@ -93,7 +93,7 @@
      <rect>
       <x>20</x>
       <y>50</y>
-      <width>171</width>
+      <width>254</width>
       <height>31</height>
      </rect>
     </property>
@@ -142,6 +142,16 @@
      </item>
     </layout>
    </widget>
+   <widget class="AudioWaveWidget" name="wave" native="true">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>100</y>
+      <width>421</width>
+      <height>101</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -176,6 +186,14 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>AudioWaveWidget</class>
+   <extends>QWidget</extends>
+   <header>AudioWaveWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="resources.qrc"/>
  </resources>
