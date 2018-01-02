@@ -13,13 +13,16 @@ SoundDevice::SoundDevice(QObject *parent) : QIODevice(parent)
     m_audioOutput = nullptr;
 }
 
-void SoundDevice::loadFile(const QString &filePath)
+bool SoundDevice::loadFile(const QString &filePath)
 {
     if (m_audioOutput) {
         delete m_audioOutput;
     }
 
-    m_audioData.load(filePath);
+    if (!m_audioData.load(filePath))
+    {
+        return false;
+    }
 
     QAudioFormat format;
     format.setChannelCount(m_audioData.numChannels());
@@ -41,6 +44,8 @@ void SoundDevice::loadFile(const QString &filePath)
     connect(m_audioOutput, &QAudioOutput::stateChanged,
             this, &SoundDevice::audioOutputStateChanged);
     open(ReadOnly);
+
+    return true;
 }
 
 const AudioData* SoundDevice::audioData() const

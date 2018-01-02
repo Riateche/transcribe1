@@ -14,7 +14,7 @@ class SoundDevice : public QIODevice
 public:
     explicit SoundDevice(QObject *parent = nullptr);
 
-    void loadFile(const QString& filePath);
+    bool loadFile(const QString& filePath);
     const AudioData* audioData() const;
 
 
