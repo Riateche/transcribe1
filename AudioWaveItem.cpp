@@ -5,6 +5,8 @@
 #include "AudioData.h"
 #include <qmath.h>
 #include <QPainter>
+#include <QGraphicsSceneMouseEvent>
+#include "Scene.h"
 
 AudioWaveItem::AudioWaveItem()
 {
@@ -124,5 +126,15 @@ void AudioWaveItem::drawWave(QPainter *painter, const QRect &rect, int channel)
         int y1 = yc - (avgPos * rect.height() / 2);
         int y2 = yc + (avgNeg * rect.height() / 2);
         painter->drawLine(rect.x()+i, rect.y()+y1, rect.x()+i, rect.y()+y2);
+    }
+}
+
+void AudioWaveItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton)
+    {
+        Scene* parent = static_cast<Scene*>(scene());
+        parent->userCursorChanged(m_samplesPerPixel * event->pos().x());
+        //emit userCursorChanged();
     }
 }

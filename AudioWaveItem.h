@@ -22,6 +22,10 @@ private:
 
     void drawWave(QPainter *painter, const QRect& rect, int channel);
 
+
+    // QGraphicsItem interface
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
 };
 
 #endif // AUDIOWAVEITEM_H
