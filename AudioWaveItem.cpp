@@ -11,6 +11,8 @@
 AudioWaveItem::AudioWaveItem()
 {
     m_audioData = 0;
+    m_userCursor = 0;
+    m_playerCursor = 0;
     m_amplitudeScale = 1.0f;
     m_samplesPerPixel = 1;
     setFlag(ItemUsesExtendedStyleOption);
@@ -55,12 +57,31 @@ void AudioWaveItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
     {
         drawWave(painter, rect, 0);
     }
+
+    int startSampleIndex = rect.x() * m_samplesPerPixel;
+    int endSampleIndex = (rect.x() + rect.width()) * m_samplesPerPixel;
+    if ((startSampleIndex <= m_userCursor) && (m_userCursor < endSampleIndex))
+    {
+        QPen pen(Qt::red);
+        painter->setPen(pen);
+        int x = m_userCursor / m_samplesPerPixel;
+        painter->drawLine(x, 0, x, m_size.height()-1);
+    }
+    if ((startSampleIndex <= m_playerCursor) && (m_playerCursor < endSampleIndex))
+    {
+        QPen pen(Qt::black);
+        painter->setPen(pen);
+        int x = m_playerCursor / m_samplesPerPixel;
+        painter->drawLine(x, 0, x, m_size.height()-1);
+    }
 }
 
 
 void AudioWaveItem::setAudioData(const AudioData *audioData)
 {
     m_audioData = audioData;
+    m_userCursor = 0;
+    m_playerCursor = 0;
     if (m_audioData != 0)
     {
         float sumsq = 0.0f;
@@ -92,6 +113,12 @@ void AudioWaveItem::setAudioData(const AudioData *audioData)
         m_size.setWidth(totalPixels);
     }
     update();
+}
+
+void AudioWaveItem::setPlayerCursor(int sampleIndex)
+{
+    m_playerCursor = sampleIndex;
+    scene()->update();
 }
 
 void AudioWaveItem::drawWave(QPainter *painter, const QRect &rect, int channel)
@@ -133,8 +160,10 @@ void AudioWaveItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
+        m_userCursor = m_samplesPerPixel * event->pos().x();
+        scene()->update();
+
         Scene* parent = static_cast<Scene*>(scene());
-        parent->userCursorChanged(m_samplesPerPixel * event->pos().x());
-        //emit userCursorChanged();
+        parent->userCursorChanged(m_userCursor);
     }
 }

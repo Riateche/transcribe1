@@ -97,6 +97,7 @@ void MainWindow::playerPositionChanged(int sampleId)
     {
         ui->position->setValue(sampleId);
     }
+    m_scene->waveItem()->setPlayerCursor(sampleId);
 }
 
 void MainWindow::userCursorChanged(int sampleId)
@@ -133,7 +134,7 @@ void MainWindow::on_play_toggled(bool checked)
     QSignalBlocker blockerPause(ui->pause);
 
     if (checked == false) ui->play->setChecked(true);
-    m_soundDevice->seek(0);
+    m_soundDevice->seek(m_userCursor);
     m_soundDevice->start();
     ui->pause->setEnabled(true);
     ui->pause->setChecked(false);
