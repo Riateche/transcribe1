@@ -4,21 +4,28 @@
 #include <QGraphicsItem>
 
 class AudioData;
+class Scene;
 
-class AudioWaveItem : public QGraphicsItem
+class AudioWaveItem : public QObject, public QGraphicsItem
 {
+    Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
 public:
-    AudioWaveItem();
+    AudioWaveItem(Scene *scene);
     void setHeight(int height);
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-    void setAudioData(const AudioData *audioData);
+
+private slots:
+    void audioDataChanged();
+    void samplesPerPixelChanged();
 
 private:
-    const AudioData* m_audioData;
     float m_amplitudeScale;
-    int m_samplesPerPixel;
     QSize m_size;
+    Scene *m_scene;
+
+
 
     void drawWave(QPainter *painter, const QRect& rect, int channel);
 

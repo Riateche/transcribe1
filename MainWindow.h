@@ -48,13 +48,18 @@ private slots:
 
     void on_position_valueChanged(int position);
 
-    void on_horizontalScrollBar_valueChanged(int value);
+    void on_visualTimeScaleDefault_triggered();
+
+    void on_visualTimeScaleIn_triggered();
+
+    void on_visualTimeScaleOut_triggered();
+
+    void on_visualTimeScaleFitAll_triggered();
 
 private:
     Ui::MainWindow *ui;
     SoundDevice *m_soundDevice;
     Scene *m_scene;
-    void updateHoritontalScrollBarRange();
 
     // QObject interface
 public:

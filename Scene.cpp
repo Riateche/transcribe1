@@ -1,18 +1,24 @@
 #include "Scene.h"
 #include "SplitterItem.h"
 #include "AudioWaveItem.h"
-
+#include "AudioData.h"
 #define MAGIC_X 500
+#include <qmath.h>
+#include <QDebug>
 
 Scene::Scene()
 {
+    m_samplesPerPixel = 1;
+    setDefaultSecondsPerPixel();
+    m_horizontalScrollBar = nullptr;
+    m_audioData = nullptr;
 
     m_scrollContainer = addRect(QRectF());
     m_rollItem = new QGraphicsRectItem(QRectF(0, 0, MAGIC_X, 20));
     m_rollItem->setPen(Qt::NoPen);
     m_rollItem->setBrush(QBrush(Qt::red));
     m_rollItem->setParentItem(m_scrollContainer);
-    m_waveItem = new AudioWaveItem();
+    m_waveItem = new AudioWaveItem(this);
     m_waveItem->setParentItem(m_scrollContainer);
     m_splitter = new SplitterItem(this);
     m_splitter->setParentItem(m_scrollContainer);
@@ -25,6 +31,7 @@ void Scene::setViewSize(const QSize &size)
 {
     m_viewSize = size;
     updateLayout();
+    updateHorizontalScrollBarRange();
 }
 
 QSize Scene::viewSize() const
@@ -32,10 +39,6 @@ QSize Scene::viewSize() const
     return m_viewSize;
 }
 
-void Scene::setHoritontalScrollPos(int pos)
-{
-    m_scrollContainer->setPos(-pos, 0);
-}
 
 void Scene::updateLayout()
 {
@@ -58,4 +61,99 @@ void Scene::updateLayout()
 AudioWaveItem *Scene::waveItem()
 {
     return m_waveItem;
+}
+
+void Scene::setAudioData(const AudioData *audioData)
+{
+    m_audioData = audioData;
+    emit audioDataChanged();
+    m_secondsPerPixel = -1; // force update
+    setDefaultSecondsPerPixel();
+    updateHorizontalScrollBarRange();
+}
+
+const AudioData *Scene::audioData()
+{
+    return m_audioData;
+}
+
+QScrollBar *Scene::horizontalScrollBar() const
+{
+    return m_horizontalScrollBar;
+}
+
+void Scene::setHorizontalScrollBar(QScrollBar *horizontalScrollBar)
+{
+    m_horizontalScrollBar = horizontalScrollBar;
+    connect(m_horizontalScrollBar, &QScrollBar::valueChanged,
+            this, &Scene::horizontalScrollBarValueChanged);
+    updateHorizontalScrollBarRange();
+}
+
+int Scene::totalTrackWidthInPixels()
+{
+    if (!m_audioData) {
+        return 0;
+    }
+    return qCeil(float(m_audioData->numSamples()) / m_samplesPerPixel);
+}
+
+//void Scene::setSamplesPerPixel(int v)
+//{
+//}
+
+int Scene::samplesPerPixel()
+{
+    return m_samplesPerPixel;
+}
+
+void Scene::setSecondsPerPixel(float v)
+{
+    if (m_secondsPerPixel == v) {
+        return;
+    }
+    m_secondsPerPixel = v;
+    if (m_audioData) {
+        m_samplesPerPixel = qRound(v * m_audioData->sampleRate());
+    } else {
+        m_samplesPerPixel = 1;
+    }
+    updateHorizontalScrollBarRange();
+    emit samplesPerPixelChanged();
+    qDebug() << "test" << m_secondsPerPixel << m_samplesPerPixel;
+
+}
+
+float Scene::secondsPerPixel()
+{
+    return m_secondsPerPixel;
+}
+
+void Scene::setDefaultSecondsPerPixel()
+{
+    setSecondsPerPixel(0.01);
+}
+
+void Scene::fitTrackHorizontally()
+{
+    if (!m_audioData || !m_viewSize.isValid()) return;
+    setSecondsPerPixel(float(m_audioData->numSamples()) / m_audioData->sampleRate() / m_viewSize.width());
+}
+
+void Scene::updateHorizontalScrollBarRange()
+{
+    if (!m_horizontalScrollBar || !m_viewSize.isValid()) {
+        return;
+    }
+    m_horizontalScrollBar->setRange(0,
+      totalTrackWidthInPixels() - m_viewSize.width());
+    horizontalScrollBarValueChanged();
+}
+
+void Scene::horizontalScrollBarValueChanged()
+{
+    if (!m_horizontalScrollBar) {
+        return;
+    }
+    m_scrollContainer->setPos(-m_horizontalScrollBar->value(), 0);
 }

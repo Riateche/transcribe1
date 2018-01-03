@@ -217,7 +217,7 @@
      <x>0</x>
      <y>0</y>
      <width>742</width>
-     <height>19</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -226,7 +226,23 @@
     </property>
     <addaction name="openFile"/>
    </widget>
+   <widget class="QMenu" name="menu_View">
+    <property name="title">
+     <string>&amp;View</string>
+    </property>
+    <widget class="QMenu" name="menuVisual_time_scale">
+     <property name="title">
+      <string>Visual time scale</string>
+     </property>
+     <addaction name="visualTimeScaleDefault"/>
+     <addaction name="visualTimeScaleIn"/>
+     <addaction name="visualTimeScaleOut"/>
+     <addaction name="visualTimeScaleFitAll"/>
+    </widget>
+    <addaction name="menuVisual_time_scale"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menu_View"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -240,6 +256,32 @@
   <action name="openFile">
    <property name="text">
     <string>&amp;Open</string>
+   </property>
+  </action>
+  <action name="visualTimeScaleIn">
+   <property name="text">
+    <string>Zoom in</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+=</string>
+   </property>
+  </action>
+  <action name="visualTimeScaleOut">
+   <property name="text">
+    <string>Zoom out</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+-</string>
+   </property>
+  </action>
+  <action name="visualTimeScaleFitAll">
+   <property name="text">
+    <string>Fit all</string>
+   </property>
+  </action>
+  <action name="visualTimeScaleDefault">
+   <property name="text">
+    <string>Default</string>
    </property>
   </action>
  </widget>

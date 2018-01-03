@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->graphicsView->installEventFilter(this);
     m_scene = new Scene();
+    m_scene->setHorizontalScrollBar(ui->horizontalScrollBar);
     ui->graphicsView->setScene(m_scene);
     ui->graphicsView->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -49,8 +50,7 @@ MainWindow::~MainWindow()
 void MainWindow::loadFile(const QString &path)
 {
     m_soundDevice->loadFile(path);
-    m_scene->waveItem()->setAudioData(m_soundDevice->audioData());
-    updateHoritontalScrollBarRange();
+    m_scene->setAudioData(m_soundDevice->audioData());
 }
 
 void MainWindow::playerDataChanged()
@@ -183,19 +183,27 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
 {
     if (watched == ui->graphicsView && event->type() == QEvent::Resize) {
         m_scene->setViewSize(ui->graphicsView->size());
-        updateHoritontalScrollBarRange();
     }
     return false;
 }
 
-void MainWindow::on_horizontalScrollBar_valueChanged(int value)
+
+void MainWindow::on_visualTimeScaleDefault_triggered()
 {
-    m_scene->setHoritontalScrollPos(value);
+    m_scene->setDefaultSecondsPerPixel();
 }
 
-void MainWindow::updateHoritontalScrollBarRange()
+void MainWindow::on_visualTimeScaleIn_triggered()
 {
-    // TODO: make a class that keeps track of horizontal scale
-    ui->horizontalScrollBar->setRange(0,
-      m_scene->waveItem()->boundingRect().width() - ui->graphicsView->width());
+    m_scene->setSecondsPerPixel(m_scene->secondsPerPixel() / 1.1);
+}
+
+void MainWindow::on_visualTimeScaleOut_triggered()
+{
+    m_scene->setSecondsPerPixel(m_scene->secondsPerPixel() * 1.1);
+}
+
+void MainWindow::on_visualTimeScaleFitAll_triggered()
+{
+    m_scene->fitTrackHorizontally();
 }
