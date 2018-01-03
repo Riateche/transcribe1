@@ -31,7 +31,8 @@ SOURCES += \
     AudioData.cpp \
     AudioWaveWidget.cpp \
     Scene.cpp \
-    SplitterItem.cpp
+    SplitterItem.cpp \
+    AudioWaveItem.cpp
 
 HEADERS += \
         MainWindow.h \
@@ -40,7 +41,8 @@ HEADERS += \
     AudioData.h \
     AudioWaveWidget.h \
     Scene.h \
-    SplitterItem.h
+    SplitterItem.h \
+    AudioWaveItem.h
 
 FORMS += \
         MainWindow.ui

@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include "SoundDevice.h"
 #include "Scene.h"
+#include "AudioWaveItem.h"
 
 using namespace soundtouch;
 
@@ -28,8 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if (args.size() > 1)
     {
         m_soundDevice->loadFile(args[1]);
-        // TODO: reimplement
-        //ui->wave->setAudioData(m_soundDevice->audioData());
+        m_scene->waveItem()->setAudioData(m_soundDevice->audioData());
     }
     show();
     m_scene->setViewSize(ui->graphicsView->size());
@@ -59,8 +59,7 @@ void MainWindow::on_openFile_triggered()
         return;
     }
     m_soundDevice->loadFile(fileName);
-    // TODO: reimplement
-    //ui->wave->setAudioData(m_soundDevice->audioData());
+    m_scene->waveItem()->setAudioData(m_soundDevice->audioData());
 }
 
 void MainWindow::on_start_clicked()

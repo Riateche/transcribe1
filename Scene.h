@@ -4,6 +4,7 @@
 #include <QGraphicsScene>
 
 class SplitterItem;
+class AudioWaveItem;
 
 class Scene : public QGraphicsScene
 {
@@ -11,13 +12,18 @@ class Scene : public QGraphicsScene
 public:
     Scene();
     void setViewSize(const QSize& size);
+    QSize viewSize() const;
 
     void updateLayout();
+
+    AudioWaveItem *waveItem();
+
+
 
 private:
     QSize m_viewSize;
     QGraphicsRectItem *m_rollItem;
-    QGraphicsRectItem *m_waveItem;
+    AudioWaveItem *m_waveItem;
     SplitterItem *m_splitter;
 
 
