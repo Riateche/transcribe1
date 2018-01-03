@@ -20,6 +20,7 @@ public:
 
     void setTempo(double v);
 
+    bool isValid();
     void start();
     void stop();
     void pause();

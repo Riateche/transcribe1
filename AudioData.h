@@ -11,6 +11,7 @@ class AudioData : public QBuffer
 public:
     explicit AudioData(QObject *parent = nullptr);
 
+    bool isValid() const;
     bool load(const QString& filePath);
     QString filePath() const;
     int numChannels() const;

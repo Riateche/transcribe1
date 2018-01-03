@@ -64,6 +64,11 @@ void SoundDevice::setTempo(double v)
     m_processor.clear();
 }
 
+bool SoundDevice::isValid()
+{
+    return m_audioData.isValid();
+}
+
 void SoundDevice::start()
 {
     m_audioOutput->start(this);

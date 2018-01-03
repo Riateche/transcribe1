@@ -8,6 +8,11 @@ AudioData::AudioData(QObject *parent) : QBuffer(parent)
     m_numSamples = 0;
 }
 
+bool AudioData::isValid() const
+{
+    return isOpen();
+}
+
 bool AudioData::load(const QString &filePath)
 {
     if (isOpen())
