@@ -27,6 +27,7 @@ public:
     void resume();
     void seek(int sampleId);
     int position() const;
+    QAudio::State state() const;
 
 signals:
     void dataChanged();

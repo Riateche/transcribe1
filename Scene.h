@@ -19,7 +19,8 @@ public:
 
     AudioWaveItem *waveItem();
 
-
+signals:
+    void userCursorChanged(int sampleIndex);
 
 private:
     QSize m_viewSize;

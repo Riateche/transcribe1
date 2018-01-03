@@ -121,6 +121,11 @@ int SoundDevice::position() const
     return m_audioData.pos() / m_audioData.sampleSize();
 }
 
+QAudio::State SoundDevice::state() const
+{
+    return m_audioOutput->state();
+}
+
 
 qint64 SoundDevice::readData(char *data, qint64 maxlen)
 {
