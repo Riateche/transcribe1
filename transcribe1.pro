@@ -29,14 +29,18 @@ SOURCES += \
     AudioFile.cpp \
     SoundDevice.cpp \
     AudioData.cpp \
-    AudioWaveWidget.cpp
+    AudioWaveWidget.cpp \
+    Scene.cpp \
+    SplitterItem.cpp
 
 HEADERS += \
         MainWindow.h \
     AudioFile.h \
     SoundDevice.h \
     AudioData.h \
-    AudioWaveWidget.h
+    AudioWaveWidget.h \
+    Scene.h \
+    SplitterItem.h
 
 FORMS += \
         MainWindow.ui

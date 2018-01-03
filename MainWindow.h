@@ -5,6 +5,7 @@
 
 
 class SoundDevice;
+class Scene;
 
 namespace Ui {
 class MainWindow;
@@ -40,6 +41,11 @@ private slots:
 private:
     Ui::MainWindow *ui;
     SoundDevice *m_soundDevice;
+    Scene *m_scene;
+
+    // QObject interface
+public:
+    bool eventFilter(QObject *watched, QEvent *event);
 };
 
 #endif // MAINWINDOW_H

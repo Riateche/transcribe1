@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include "SoundDevice.h"
+#include "Scene.h"
 
 using namespace soundtouch;
 
@@ -15,14 +16,24 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->graphicsView->installEventFilter(this);
+    m_scene = new Scene();
+    ui->graphicsView->setScene(m_scene);
+    ui->graphicsView->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
     m_soundDevice = new SoundDevice();
     auto args = qApp->arguments();
     if (args.size() > 1)
     {
         m_soundDevice->loadFile(args[1]);
-        ui->wave->setAudioData(m_soundDevice->audioData());
+        // TODO: reimplement
+        //ui->wave->setAudioData(m_soundDevice->audioData());
     }
-    //m_soundDevice->setTempo(5);
+    show();
+    m_scene->setViewSize(ui->graphicsView->size());
+
 }
 
 MainWindow::~MainWindow()
@@ -48,7 +59,8 @@ void MainWindow::on_openFile_triggered()
         return;
     }
     m_soundDevice->loadFile(fileName);
-    ui->wave->setAudioData(m_soundDevice->audioData());
+    // TODO: reimplement
+    //ui->wave->setAudioData(m_soundDevice->audioData());
 }
 
 void MainWindow::on_start_clicked()
@@ -88,4 +100,13 @@ void MainWindow::on_speed50_toggled(bool checked)
 void MainWindow::on_speed100_toggled(bool checked)
 {
     if (checked) m_soundDevice->setTempo(1.0);
+}
+
+
+bool MainWindow::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == ui->graphicsView && event->type() == QEvent::Resize) {
+        m_scene->setViewSize(ui->graphicsView->size());
+    }
+    return false;
 }
