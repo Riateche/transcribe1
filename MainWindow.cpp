@@ -67,7 +67,7 @@ void MainWindow::on_openFile_triggered()
     loadFile(fileName);
 }
 
-void MainWindow::on_start_clicked()
+void MainWindow::on_play_clicked()
 {
     m_soundDevice->start();
 }
@@ -77,7 +77,7 @@ void MainWindow::on_stop_clicked()
     m_soundDevice->stop();
 }
 
-void MainWindow::on_togglePause_toggled(bool checked)
+void MainWindow::on_pause_toggled(bool checked)
 {
     if (checked) {
         m_soundDevice->pause();
