@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QAudio>
 
 
 class SoundDevice;
@@ -23,7 +24,7 @@ public:
 
 private slots:
     void playerDataChanged();
-    void playerStateChanged(bool isPlaying);
+    void playerStateChanged(QAudio::State state);
     void playerPositionChanged(int sampleId);
 
 private slots:
@@ -45,7 +46,7 @@ private slots:
 
     void on_speed100_toggled(bool checked);
 
-    void on_position_sliderMoved(int position);
+    void on_position_valueChanged(int position);
 
     void on_horizontalScrollBar_valueChanged(int value);
 

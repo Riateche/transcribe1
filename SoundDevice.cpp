@@ -33,6 +33,7 @@ bool SoundDevice::loadFile(const QString &filePath)
     format.setCodec("audio/pcm");
     format.setByteOrder(QAudioFormat::LittleEndian);
     m_audioOutput = new QAudioOutput(format);
+    connect(m_audioOutput, &QAudioOutput::stateChanged, this, &SoundDevice::stateChanged);
 
     m_processor.setChannels(m_audioData.numChannels());
     m_processor.setSampleRate(m_audioData.sampleRate());
@@ -76,7 +77,6 @@ void SoundDevice::start()
 {
     m_audioOutput->start(this);
     qDebug() << m_audioOutput->state() << m_audioOutput->error();
-    emit stateChanged(true);
 }
 
 void SoundDevice::stop()
@@ -84,24 +84,41 @@ void SoundDevice::stop()
     qDebug() << "stopped";
     m_processor.clear();
     m_audioOutput->stop();
-    emit stateChanged(false);
 }
 
 void SoundDevice::pause()
 {
     m_audioOutput->suspend();
-    emit stateChanged(false);
 }
 
 void SoundDevice::resume()
 {
-    m_audioOutput->resume();
-    emit stateChanged(true);
+    if (m_audioOutput->state() == QAudio::SuspendedState)
+    {
+        m_audioOutput->resume();
+    }
+    else if (m_audioOutput->state() == QAudio::StoppedState)
+    {
+        m_audioOutput->start(this);
+    }
 }
 
 void SoundDevice::seek(int sampleId)
 {
-    //
+    m_processor.clear();
+    m_audioData.seek(sampleId * m_audioData.sampleSize());
+
+    QAudio::State state = m_audioOutput->state();
+    m_audioOutput->reset();
+    if (state == QAudio::ActiveState)
+    {
+        m_audioOutput->start(this);
+    }
+}
+
+int SoundDevice::position() const
+{
+    return m_audioData.pos() / m_audioData.sampleSize();
 }
 
 
@@ -111,15 +128,13 @@ qint64 SoundDevice::readData(char *data, qint64 maxlen)
         return -1;
     }
 
-    qint64 sampleSize = sizeof(float) * m_audioData.numChannels();
-
-    qint64 requestedSamples = maxlen / sampleSize;
+    qint64 requestedSamples = maxlen / m_audioData.sampleSize();
 
     while (!m_audioData.atEnd() && (m_processor.numSamples() < requestedSamples))
     {
         char buf[4096];
         qint64 size = m_audioData.read(buf, sizeof(buf));
-        m_processor.putSamples(reinterpret_cast<float*>(&buf), size / sampleSize);
+        m_processor.putSamples(reinterpret_cast<float*>(&buf), size / m_audioData.sampleSize());
     }
     if (m_audioData.atEnd())
     {
@@ -128,7 +143,7 @@ qint64 SoundDevice::readData(char *data, qint64 maxlen)
     }
     else
     {
-        emit positionChanged(m_audioData.pos() / sampleSize);
+        emit positionChanged(m_audioData.pos() / m_audioData.sampleSize());
     }
 
     if (m_processor.numUnprocessedSamples() == 0) {
@@ -136,9 +151,9 @@ qint64 SoundDevice::readData(char *data, qint64 maxlen)
     }
 
     qint64 outputSamples = m_processor.receiveSamples(reinterpret_cast<float*>(data),
-                                                      static_cast<uint>(maxlen / sampleSize));
+                                                      static_cast<uint>(maxlen / m_audioData.sampleSize()));
     qDebug() << "numSamples =" << m_processor.numSamples() << "numUnprocessedSamples =" << m_processor.numUnprocessedSamples();
-    return outputSamples * sampleSize;
+    return outputSamples * m_audioData.sampleSize();
 }
 
 qint64 SoundDevice::writeData(const char *data, qint64 len)

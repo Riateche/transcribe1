@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QSignalBlocker>
+#include <QSlider>
 #include "SoundDevice.h"
 #include "Scene.h"
 #include "AudioWaveItem.h"
@@ -63,17 +64,37 @@ void MainWindow::playerDataChanged()
     ui->stop->setEnabled(false);
     ui->pause->setChecked(false);
     ui->play->setChecked(false);
+
+    if (m_soundDevice->isValid())
+    {
+        ui->position->setMaximum(m_soundDevice->audioData()->numSamples());
+        ui->position->setValue(m_soundDevice->position());
+    }
 }
 
-void MainWindow::playerStateChanged(bool isPlaying)
+void MainWindow::playerStateChanged(QAudio::State state)
 {
-    QSignalBlocker blockerPlay(ui->play);
-    QSignalBlocker blockerPause(ui->pause);
+    if (state == QAudio::IdleState)
+    {
+        QSignalBlocker blockerPlay(ui->play);
+        QSignalBlocker blockerPause(ui->pause);
+
+        ui->play->setEnabled(true);
+        ui->pause->setEnabled(false);
+        ui->stop->setEnabled(false);
+        ui->pause->setChecked(false);
+        ui->play->setChecked(false);
+    }
 }
 
 void MainWindow::playerPositionChanged(int sampleId)
 {
-    ui->position->setValue(sampleId);
+    QSignalBlocker blocker(ui->position);
+
+    if (!ui->position->isSliderDown())
+    {
+        ui->position->setValue(sampleId);
+    }
 }
 
 void MainWindow::on_test1_toggled(bool checked)
@@ -98,9 +119,10 @@ void MainWindow::on_openFile_triggered()
 
 void MainWindow::on_play_toggled(bool checked)
 {
-    QSignalBlocker blockerPlay(ui->pause);
+    QSignalBlocker blockerPause(ui->pause);
 
     if (checked == false) ui->play->setChecked(true);
+    m_soundDevice->seek(0);
     m_soundDevice->start();
     ui->pause->setEnabled(true);
     ui->pause->setChecked(false);
@@ -150,8 +172,9 @@ void MainWindow::on_speed100_toggled(bool checked)
     if (checked) m_soundDevice->setTempo(1.0);
 }
 
-void MainWindow::on_position_sliderMoved(int position)
+void MainWindow::on_position_valueChanged(int position)
 {
+    qDebug() << "sliderMoved: " << position;
     m_soundDevice->seek(position);
 }
 

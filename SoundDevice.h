@@ -26,10 +26,11 @@ public:
     void pause();
     void resume();
     void seek(int sampleId);
+    int position() const;
 
 signals:
     void dataChanged();
-    void stateChanged(bool isPlaying);
+    void stateChanged(QAudio::State state);
     void positionChanged(int sampleId);
 
 

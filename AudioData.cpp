@@ -60,6 +60,11 @@ int AudioData::numSamples() const
     return m_numSamples;
 }
 
+int AudioData::sampleSize() const
+{
+    return sizeof(float) * m_numChannels;
+}
+
 float AudioData::sample(int channel, int sampleIndex) const
 {
     int index = sampleIndex * m_numChannels + channel;

@@ -17,6 +17,7 @@ public:
     int numChannels() const;
     int sampleRate() const;
     int numSamples() const;
+    int sampleSize() const; // Sample size in bytes (total for all channels).
 
     float sample(int channel, int sampleIndex) const;
 
