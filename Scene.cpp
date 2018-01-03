@@ -140,6 +140,16 @@ void Scene::fitTrackHorizontally()
     setSecondsPerPixel(float(m_audioData->numSamples()) / m_audioData->sampleRate() / m_viewSize.width());
 }
 
+int Scene::pixelXToSample(int pixelX)
+{
+    return m_samplesPerPixel * pixelX;
+}
+
+int Scene::sampleToPixelX(int sample)
+{
+    return qFloor(float(sample) / m_samplesPerPixel);
+}
+
 void Scene::updateHorizontalScrollBarRange()
 {
     if (!m_horizontalScrollBar || !m_viewSize.isValid()) {

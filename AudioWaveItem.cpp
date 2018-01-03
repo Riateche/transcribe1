@@ -70,14 +70,14 @@ void AudioWaveItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
     {
         QPen pen(Qt::red);
         painter->setPen(pen);
-        int x = m_userCursor / m_scene->samplesPerPixel();
+        int x = m_scene->sampleToPixelX(m_userCursor);
         painter->drawLine(x, 0, x, m_size.height()-1);
     }
     if ((startSampleIndex <= m_playerCursor) && (m_playerCursor < endSampleIndex))
     {
         QPen pen(Qt::black);
         painter->setPen(pen);
-        int x = m_playerCursor / m_scene->samplesPerPixel();
+        int x = m_scene->sampleToPixelX(m_playerCursor);
         painter->drawLine(x, 0, x, m_size.height()-1);
     }
 }
@@ -127,7 +127,7 @@ void AudioWaveItem::samplesPerPixelChanged()
 void AudioWaveItem::setPlayerCursor(int sampleIndex)
 {
     m_playerCursor = sampleIndex;
-    scene()->update();
+    update();
 }
 
 void AudioWaveItem::drawWave(QPainter *painter, const QRect &rect, int channel)
@@ -169,10 +169,9 @@ void AudioWaveItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
-        m_userCursor = m_scene->samplesPerPixel() * event->pos().x();
-        scene()->update();
+        m_userCursor = m_scene->pixelXToSample(event->pos().x());
+        update();
 
-        Scene* parent = static_cast<Scene*>(scene());
-        parent->userCursorChanged(m_userCursor);
+        m_scene->userCursorChanged(m_userCursor);
     }
 }

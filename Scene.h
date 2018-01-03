@@ -36,6 +36,10 @@ public:
 
     void setDefaultSecondsPerPixel();
     void fitTrackHorizontally();
+
+    int pixelXToSample(int pixelX);
+    int sampleToPixelX(int sample);
+
 signals:
     void audioDataChanged();
     void samplesPerPixelChanged();
