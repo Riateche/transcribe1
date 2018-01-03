@@ -25,7 +25,12 @@ public:
     void stop();
     void pause();
     void resume();
+    void seek(int sampleId);
 
+signals:
+    void dataChanged();
+    void stateChanged(bool isPlaying);
+    void positionChanged(int sampleId);
 
 
 private:

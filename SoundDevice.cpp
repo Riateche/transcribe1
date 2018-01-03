@@ -21,6 +21,7 @@ bool SoundDevice::loadFile(const QString &filePath)
 
     if (!m_audioData.load(filePath))
     {
+        emit dataChanged();
         return false;
     }
 
@@ -44,6 +45,8 @@ bool SoundDevice::loadFile(const QString &filePath)
     connect(m_audioOutput, &QAudioOutput::stateChanged,
             this, &SoundDevice::audioOutputStateChanged);
     open(ReadOnly);
+
+    emit dataChanged();
 
     return true;
 }
@@ -73,6 +76,7 @@ void SoundDevice::start()
 {
     m_audioOutput->start(this);
     qDebug() << m_audioOutput->state() << m_audioOutput->error();
+    emit stateChanged(true);
 }
 
 void SoundDevice::stop()
@@ -80,16 +84,24 @@ void SoundDevice::stop()
     qDebug() << "stopped";
     m_processor.clear();
     m_audioOutput->stop();
+    emit stateChanged(false);
 }
 
 void SoundDevice::pause()
 {
     m_audioOutput->suspend();
+    emit stateChanged(false);
 }
 
 void SoundDevice::resume()
 {
     m_audioOutput->resume();
+    emit stateChanged(true);
+}
+
+void SoundDevice::seek(int sampleId)
+{
+    //
 }
 
 
@@ -112,6 +124,11 @@ qint64 SoundDevice::readData(char *data, qint64 maxlen)
     if (m_audioData.atEnd())
     {
         m_processor.flush();
+        emit positionChanged(m_audioData.numSamples());
+    }
+    else
+    {
+        emit positionChanged(m_audioData.pos() / sampleSize);
     }
 
     if (m_processor.numUnprocessedSamples() == 0) {
