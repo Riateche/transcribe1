@@ -6,6 +6,7 @@
 #include <QBuffer>
 #include <QDebug>
 #include <QFileDialog>
+#include <QSignalBlocker>
 #include "SoundDevice.h"
 #include "Scene.h"
 #include "AudioWaveItem.h"
@@ -25,6 +26,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     m_soundDevice = new SoundDevice();
+    connect(m_soundDevice, &SoundDevice::dataChanged, this, &MainWindow::playerDataChanged);
+    connect(m_soundDevice, &SoundDevice::stateChanged, this, &MainWindow::playerStateChanged);
+    connect(m_soundDevice, &SoundDevice::positionChanged, this, &MainWindow::playerPositionChanged);
+
     auto args = qApp->arguments();
     if (args.size() > 1)
     {
@@ -47,6 +52,30 @@ void MainWindow::loadFile(const QString &path)
     updateHoritontalScrollBarRange();
 }
 
+void MainWindow::playerDataChanged()
+{
+    QSignalBlocker blockerPlay(ui->play);
+    QSignalBlocker blockerPause(ui->pause);
+
+    qDebug() << "playerDataChanged()";
+    ui->play->setEnabled(m_soundDevice->isValid());
+    ui->pause->setEnabled(false);
+    ui->stop->setEnabled(false);
+    ui->pause->setChecked(false);
+    ui->play->setChecked(false);
+}
+
+void MainWindow::playerStateChanged(bool isPlaying)
+{
+    QSignalBlocker blockerPlay(ui->play);
+    QSignalBlocker blockerPause(ui->pause);
+}
+
+void MainWindow::playerPositionChanged(int sampleId)
+{
+    ui->position->setValue(sampleId);
+}
+
 void MainWindow::on_test1_toggled(bool checked)
 {
     if (checked) {
@@ -67,18 +96,33 @@ void MainWindow::on_openFile_triggered()
     loadFile(fileName);
 }
 
-void MainWindow::on_play_clicked()
+void MainWindow::on_play_toggled(bool checked)
 {
+    QSignalBlocker blockerPlay(ui->pause);
+
+    if (checked == false) ui->play->setChecked(true);
     m_soundDevice->start();
+    ui->pause->setEnabled(true);
+    ui->pause->setChecked(false);
+    ui->stop->setEnabled(true);
 }
 
 void MainWindow::on_stop_clicked()
 {
+    QSignalBlocker blockerPlay(ui->play);
+    QSignalBlocker blockerPause(ui->pause);
+
     m_soundDevice->stop();
+    ui->pause->setEnabled(false);
+    ui->stop->setEnabled(false);
+    ui->play->setChecked(false);
+    ui->pause->setChecked(false);
 }
 
 void MainWindow::on_pause_toggled(bool checked)
 {
+    QSignalBlocker blockerPlay(ui->play);
+    ui->play->setChecked(!checked);
     if (checked) {
         m_soundDevice->pause();
     } else {
@@ -104,6 +148,11 @@ void MainWindow::on_speed50_toggled(bool checked)
 void MainWindow::on_speed100_toggled(bool checked)
 {
     if (checked) m_soundDevice->setTempo(1.0);
+}
+
+void MainWindow::on_position_sliderMoved(int position)
+{
+    m_soundDevice->seek(position);
 }
 
 

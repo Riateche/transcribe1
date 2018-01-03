@@ -22,11 +22,16 @@ public:
     void loadFile(const QString& path);
 
 private slots:
+    void playerDataChanged();
+    void playerStateChanged(bool isPlaying);
+    void playerPositionChanged(int sampleId);
+
+private slots:
     void on_test1_toggled(bool checked);
 
     void on_openFile_triggered();
 
-    void on_play_clicked();
+    void on_play_toggled(bool checked);
 
     void on_stop_clicked();
 
@@ -39,6 +44,8 @@ private slots:
     void on_speed50_toggled(bool checked);
 
     void on_speed100_toggled(bool checked);
+
+    void on_position_sliderMoved(int position);
 
     void on_horizontalScrollBar_valueChanged(int value);
 
