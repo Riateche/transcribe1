@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_soundDevice, &SoundDevice::dataChanged, this, &MainWindow::playerDataChanged);
     connect(m_soundDevice, &SoundDevice::stateChanged, this, &MainWindow::playerStateChanged);
     connect(m_soundDevice, &SoundDevice::positionChanged, this, &MainWindow::playerPositionChanged);
+    connect(m_scene, &Scene::userCursorChanged, this, &MainWindow::userCursorChanged);
 
     auto args = qApp->arguments();
     if (args.size() > 1)
@@ -70,6 +71,7 @@ void MainWindow::playerDataChanged()
         ui->position->setMaximum(m_soundDevice->audioData()->numSamples());
         ui->position->setValue(m_soundDevice->position());
     }
+    m_userCursor = 0;
 }
 
 void MainWindow::playerStateChanged(QAudio::State state)
@@ -95,6 +97,16 @@ void MainWindow::playerPositionChanged(int sampleId)
     {
         ui->position->setValue(sampleId);
     }
+    m_scene->waveItem()->setPlayerCursor(sampleId);
+}
+
+void MainWindow::userCursorChanged(int sampleId)
+{
+    if (m_soundDevice->state() == QAudio::ActiveState)
+    {
+        m_soundDevice->seek(sampleId);
+    }
+    m_userCursor = sampleId;
 }
 
 void MainWindow::on_test1_toggled(bool checked)
@@ -122,7 +134,7 @@ void MainWindow::on_play_toggled(bool checked)
     QSignalBlocker blockerPause(ui->pause);
 
     if (checked == false) ui->play->setChecked(true);
-    m_soundDevice->seek(0);
+    m_soundDevice->seek(m_userCursor);
     m_soundDevice->start();
     ui->pause->setEnabled(true);
     ui->pause->setChecked(false);

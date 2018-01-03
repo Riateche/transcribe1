@@ -6,10 +6,14 @@
 #include <qmath.h>
 #include <QPainter>
 #include "Scene.h"
+#include <QGraphicsSceneMouseEvent>
+#include "Scene.h"
 
 AudioWaveItem::AudioWaveItem(Scene *scene)
 {
     m_scene = scene;
+    m_userCursor = 0;
+    m_playerCursor = 0;
     m_amplitudeScale = 1.0f;
     setFlag(ItemUsesExtendedStyleOption);
     connect(scene, &Scene::audioDataChanged,
@@ -59,12 +63,32 @@ void AudioWaveItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
     {
         drawWave(painter, rect, 0);
     }
+
+    int startSampleIndex = rect.x() * m_scene->samplesPerPixel();
+    int endSampleIndex = (rect.x() + rect.width()) * m_scene->samplesPerPixel();
+    if ((startSampleIndex <= m_userCursor) && (m_userCursor < endSampleIndex))
+    {
+        QPen pen(Qt::red);
+        painter->setPen(pen);
+        int x = m_userCursor / m_scene->samplesPerPixel();
+        painter->drawLine(x, 0, x, m_size.height()-1);
+    }
+    if ((startSampleIndex <= m_playerCursor) && (m_playerCursor < endSampleIndex))
+    {
+        QPen pen(Qt::black);
+        painter->setPen(pen);
+        int x = m_playerCursor / m_scene->samplesPerPixel();
+        painter->drawLine(x, 0, x, m_size.height()-1);
+    }
 }
 
 
 void AudioWaveItem::audioDataChanged()
 {
-    if (m_scene->audioData() != 0)
+    if (!m_scene->audioData()) return;
+
+    m_userCursor = 0;
+    m_playerCursor = 0;
     {
         float sumsq = 0.0f;
         for (int i = 0; i < m_scene->audioData()->numSamples(); i++)
@@ -100,6 +124,12 @@ void AudioWaveItem::samplesPerPixelChanged()
     m_size.setWidth(m_scene->totalTrackWidthInPixels());
 }
 
+void AudioWaveItem::setPlayerCursor(int sampleIndex)
+{
+    m_playerCursor = sampleIndex;
+    scene()->update();
+}
+
 void AudioWaveItem::drawWave(QPainter *painter, const QRect &rect, int channel)
 {
     //qDebug() << "drawWave: " << rect;
@@ -132,5 +162,17 @@ void AudioWaveItem::drawWave(QPainter *painter, const QRect &rect, int channel)
         int y1 = yc - (avgPos * rect.height() / 2);
         int y2 = yc + (avgNeg * rect.height() / 2);
         painter->drawLine(rect.x()+i, rect.y()+y1, rect.x()+i, rect.y()+y2);
+    }
+}
+
+void AudioWaveItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton)
+    {
+        m_userCursor = m_scene->samplesPerPixel() * event->pos().x();
+        scene()->update();
+
+        Scene* parent = static_cast<Scene*>(scene());
+        parent->userCursorChanged(m_userCursor);
     }
 }

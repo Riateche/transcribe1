@@ -26,6 +26,7 @@ private slots:
     void playerDataChanged();
     void playerStateChanged(QAudio::State state);
     void playerPositionChanged(int sampleId);
+    void userCursorChanged(int sampleId);
 
 private slots:
     void on_test1_toggled(bool checked);
@@ -59,6 +60,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     SoundDevice *m_soundDevice;
+    int m_userCursor;
     Scene *m_scene;
 
     // QObject interface

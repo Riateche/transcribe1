@@ -36,10 +36,10 @@ public:
 
     void setDefaultSecondsPerPixel();
     void fitTrackHorizontally();
-
 signals:
     void audioDataChanged();
     void samplesPerPixelChanged();
+    void userCursorChanged(int sampleIndex);
 
 private:
     QSize m_viewSize;
