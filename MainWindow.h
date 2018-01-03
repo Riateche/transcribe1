@@ -19,6 +19,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void loadFile(const QString& path);
+
 private slots:
     void on_test1_toggled(bool checked);
 
@@ -38,10 +40,13 @@ private slots:
 
     void on_speed100_toggled(bool checked);
 
+    void on_horizontalScrollBar_valueChanged(int value);
+
 private:
     Ui::MainWindow *ui;
     SoundDevice *m_soundDevice;
     Scene *m_scene;
+    void updateHoritontalScrollBarRange();
 
     // QObject interface
 public:

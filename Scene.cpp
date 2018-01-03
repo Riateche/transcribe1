@@ -7,13 +7,17 @@
 Scene::Scene()
 {
 
-    m_rollItem = addRect(QRectF(0, 0, MAGIC_X, 20), Qt::NoPen, QBrush(Qt::red));
+    m_scrollContainer = addRect(QRectF());
+    m_rollItem = new QGraphicsRectItem(QRectF(0, 0, MAGIC_X, 20));
+    m_rollItem->setPen(Qt::NoPen);
+    m_rollItem->setBrush(QBrush(Qt::red));
+    m_rollItem->setParentItem(m_scrollContainer);
     m_waveItem = new AudioWaveItem();
-    addItem(m_waveItem);
+    m_waveItem->setParentItem(m_scrollContainer);
     m_splitter = new SplitterItem(this);
+    m_splitter->setParentItem(m_scrollContainer);
     m_splitter->setRect(QRectF(0, 0, MAGIC_X, 10));
     m_splitter->setPos(0, 20);
-    addItem(m_splitter);
     updateLayout();
 }
 
@@ -26,6 +30,11 @@ void Scene::setViewSize(const QSize &size)
 QSize Scene::viewSize() const
 {
     return m_viewSize;
+}
+
+void Scene::setHoritontalScrollPos(int pos)
+{
+    m_scrollContainer->setPos(-pos, 0);
 }
 
 void Scene::updateLayout()

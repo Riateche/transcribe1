@@ -13,6 +13,7 @@ public:
     Scene();
     void setViewSize(const QSize& size);
     QSize viewSize() const;
+    void setHoritontalScrollPos(int pos);
 
     void updateLayout();
 
@@ -22,6 +23,7 @@ public:
 
 private:
     QSize m_viewSize;
+    QGraphicsRectItem *m_scrollContainer;
     QGraphicsRectItem *m_rollItem;
     AudioWaveItem *m_waveItem;
     SplitterItem *m_splitter;

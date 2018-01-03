@@ -2,6 +2,7 @@
 #include <QPen>
 #include <QBrush>
 #include <QTimer>
+#include <QCursor>
 #include "Scene.h"
 #include <QDebug>
 
@@ -11,7 +12,7 @@ SplitterItem::SplitterItem(Scene *scene)
     setPen(Qt::NoPen);
     setBrush(QBrush(Qt::green));
     setFlags(flags() | ItemIsMovable | ItemSendsScenePositionChanges);
-
+    setCursor(Qt::SizeVerCursor);
 
 }
 

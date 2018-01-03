@@ -28,8 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     auto args = qApp->arguments();
     if (args.size() > 1)
     {
-        m_soundDevice->loadFile(args[1]);
-        m_scene->waveItem()->setAudioData(m_soundDevice->audioData());
+        loadFile(args[1]);
     }
     show();
     m_scene->setViewSize(ui->graphicsView->size());
@@ -39,6 +38,13 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::loadFile(const QString &path)
+{
+    m_soundDevice->loadFile(path);
+    m_scene->waveItem()->setAudioData(m_soundDevice->audioData());
+    updateHoritontalScrollBarRange();
 }
 
 void MainWindow::on_test1_toggled(bool checked)
@@ -58,8 +64,7 @@ void MainWindow::on_openFile_triggered()
     {
         return;
     }
-    m_soundDevice->loadFile(fileName);
-    m_scene->waveItem()->setAudioData(m_soundDevice->audioData());
+    loadFile(fileName);
 }
 
 void MainWindow::on_start_clicked()
@@ -106,6 +111,19 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
 {
     if (watched == ui->graphicsView && event->type() == QEvent::Resize) {
         m_scene->setViewSize(ui->graphicsView->size());
+        updateHoritontalScrollBarRange();
     }
     return false;
+}
+
+void MainWindow::on_horizontalScrollBar_valueChanged(int value)
+{
+    m_scene->setHoritontalScrollPos(value);
+}
+
+void MainWindow::updateHoritontalScrollBarRange()
+{
+    // TODO: make a class that keeps track of horizontal scale
+    ui->horizontalScrollBar->setRange(0,
+      m_scene->waveItem()->boundingRect().width() - ui->graphicsView->width());
 }
