@@ -4,6 +4,7 @@
 #include <QGraphicsItem>
 #include <QHash>
 #include <QPair>
+#include "AudioWaveData.h"
 
 class AudioData;
 class Scene;
@@ -32,12 +33,12 @@ private:
     QSize m_size;
     Scene *m_scene;
     QHash<int, QPair<float, float>> m_sampleAvgCache[2];
+    AudioWaveData m_audioWaveData;
 
 
 
     void drawWave(QPainter *painter, const QRect& rect, int channel);
     void drawUserCursor();
-    QPair<float, float> calculateAvg(int channel, int sampleIndex);
     void updateUserCursor(int sampleIndexFirst, int sampleIndexLast);
 
 
