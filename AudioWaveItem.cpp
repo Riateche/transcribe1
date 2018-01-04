@@ -122,6 +122,8 @@ void AudioWaveItem::samplesPerPixelChanged()
 {
     prepareGeometryChange();
     m_size.setWidth(m_scene->totalTrackWidthInPixels());
+    m_sampleAvgCache[0].clear();
+    m_sampleAvgCache[1].clear();
 }
 
 void AudioWaveItem::setPlayerCursor(int sampleIndex)
@@ -138,6 +140,19 @@ void AudioWaveItem::drawWave(QPainter *painter, const QRect &rect, int channel)
     for (int i = 0; i < rect.width(); i++)
     {
         int sampleIndex = (i + rect.x()) * m_scene->samplesPerPixel();
+        QPair<float, float> avg = calculateAvg(channel, sampleIndex);
+
+        int yc = rect.height() / 2;
+        int y1 = yc - (avg.first * rect.height() / 2);
+        int y2 = yc + (avg.second * rect.height() / 2);
+        painter->drawLine(rect.x()+i, rect.y()+y1, rect.x()+i, rect.y()+y2);
+    }
+}
+
+QPair<float, float> AudioWaveItem::calculateAvg(int channel, int sampleIndex)
+{
+    if (!m_sampleAvgCache[channel].contains(sampleIndex))
+    {
         float sumPos = 0, sumNeg = 0;
         int cntPos = 0, cntNeg = 0;
         for (int j = 0; j < m_scene->samplesPerPixel(); j++)
@@ -157,12 +172,9 @@ void AudioWaveItem::drawWave(QPainter *painter, const QRect &rect, int channel)
 
         float avgPos = (cntPos>0)? (sumPos/cntPos) : 0;
         float avgNeg = (cntNeg>0)? (qAbs(sumNeg)/cntNeg) : 0;
-
-        int yc = rect.height() / 2;
-        int y1 = yc - (avgPos * rect.height() / 2);
-        int y2 = yc + (avgNeg * rect.height() / 2);
-        painter->drawLine(rect.x()+i, rect.y()+y1, rect.x()+i, rect.y()+y2);
+        m_sampleAvgCache[channel][sampleIndex] = qMakePair(avgPos, avgNeg);
     }
+    return m_sampleAvgCache[channel][sampleIndex];
 }
 
 void AudioWaveItem::mousePressEvent(QGraphicsSceneMouseEvent *event)

@@ -2,6 +2,8 @@
 #define AUDIOWAVEITEM_H
 
 #include <QGraphicsItem>
+#include <QHash>
+#include <QPair>
 
 class AudioData;
 class Scene;
@@ -28,11 +30,13 @@ private:
     float m_amplitudeScale;
     QSize m_size;
     Scene *m_scene;
+    QHash<int, QPair<float, float>> m_sampleAvgCache[2];
 
 
 
     void drawWave(QPainter *painter, const QRect& rect, int channel);
     void drawUserCursor();
+    QPair<float, float> calculateAvg(int channel, int sampleIndex);
 
 
     // QGraphicsItem interface
