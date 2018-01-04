@@ -9,7 +9,6 @@
 Scene::Scene()
 {
     m_samplesPerPixel = 1;
-    setDefaultSecondsPerPixel();
     m_horizontalScrollBar = nullptr;
     m_audioData = nullptr;
 
@@ -24,6 +23,7 @@ Scene::Scene()
     m_splitter->setParentItem(m_scrollContainer);
     m_splitter->setRect(QRectF(0, 0, MAGIC_X, 10));
     m_splitter->setPos(0, 20);
+    setDefaultSecondsPerPixel();
     updateLayout();
 }
 
@@ -107,11 +107,19 @@ int Scene::samplesPerPixel()
     return m_samplesPerPixel;
 }
 
-void Scene::setSecondsPerPixel(float v)
+void Scene::setSecondsPerPixel(float v, int scalePoint)
 {
     if (m_secondsPerPixel == v) {
         return;
     }
+
+    if (scalePoint == -1)
+    {
+        int center = -m_scrollContainer->pos().x() + m_viewSize.width() / 2;
+        scalePoint = pixelXToSample(center);
+    }
+    float scalePointFraction = (sampleToPixelX(scalePoint) + m_scrollContainer->pos().x()) / (float)m_viewSize.width();
+
     m_secondsPerPixel = v;
     if (m_audioData) {
         m_samplesPerPixel = qRound(v * m_audioData->sampleRate());
@@ -126,6 +134,18 @@ void Scene::setSecondsPerPixel(float v)
     emit samplesPerPixelChanged();
     qDebug() << "test" << m_secondsPerPixel << m_samplesPerPixel;
 
+    int scalePointX = sampleToPixelX(scalePoint);
+    int viewportX = m_viewSize.width() * scalePointFraction;
+    int offset = scalePointX - viewportX;
+    if ((offset + m_viewSize.width()) > totalTrackWidthInPixels())
+    {
+        offset = totalTrackWidthInPixels() - m_viewSize.width();
+    }
+    if (offset < 0)
+    {
+        offset = 0;
+    }
+    m_scrollContainer->setPos(-offset, 0);
 }
 
 float Scene::secondsPerPixel()

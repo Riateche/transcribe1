@@ -45,6 +45,7 @@ private:
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void wheelEvent(QGraphicsSceneWheelEvent *event);
 };
 
 #endif // AUDIOWAVEITEM_H

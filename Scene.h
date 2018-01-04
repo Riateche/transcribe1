@@ -31,7 +31,7 @@ public:
     int totalTrackWidthInPixels();
     //void setSamplesPerPixel(int v);
     int samplesPerPixel();
-    void setSecondsPerPixel(float v);
+    void setSecondsPerPixel(float v, int scalePoint = -1);
     float secondsPerPixel();
 
     void setDefaultSecondsPerPixel();
