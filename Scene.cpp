@@ -115,6 +115,10 @@ void Scene::setSecondsPerPixel(float v)
     m_secondsPerPixel = v;
     if (m_audioData) {
         m_samplesPerPixel = qRound(v * m_audioData->sampleRate());
+        if (m_samplesPerPixel < 1)
+        {
+            m_samplesPerPixel = 1;
+        }
     } else {
         m_samplesPerPixel = 1;
     }
