@@ -44,6 +44,8 @@ signals:
     void audioDataChanged();
     void samplesPerPixelChanged();
     void userCursorChanged(int sampleIndex);
+    void userSelectionChanged(int sampleIndexFrom, int sampleIndexTo);
+    void userSelectionCleared();
 
 private:
     QSize m_viewSize;

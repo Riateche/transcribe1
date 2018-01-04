@@ -26,6 +26,7 @@ private slots:
 
 private:
     int m_userCursor;
+    int m_userCursorEnd;
     int m_playerCursor;
     float m_amplitudeScale;
     QSize m_size;
@@ -37,11 +38,13 @@ private:
     void drawWave(QPainter *painter, const QRect& rect, int channel);
     void drawUserCursor();
     QPair<float, float> calculateAvg(int channel, int sampleIndex);
+    void updateUserCursor(int sampleIndexFirst, int sampleIndexLast);
 
 
     // QGraphicsItem interface
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 };
 
 #endif // AUDIOWAVEITEM_H
