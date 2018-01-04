@@ -40,6 +40,11 @@ public:
     int pixelXToSample(int pixelX);
     int sampleToPixelX(int sample);
 
+    void setHorizontalScrollValue(int pixelOffset);
+    int horizontalScrollValue() const;
+
+    void processMouseWheelEvent(QGraphicsSceneWheelEvent *event);
+
 signals:
     void audioDataChanged();
     void samplesPerPixelChanged();

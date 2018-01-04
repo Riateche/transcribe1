@@ -5,6 +5,7 @@
 #define MAGIC_X 500
 #include <qmath.h>
 #include <QDebug>
+#include <QGraphicsSceneWheelEvent>
 
 Scene::Scene()
 {
@@ -136,16 +137,7 @@ void Scene::setSecondsPerPixel(float v, int scalePoint)
 
     int scalePointX = sampleToPixelX(scalePoint);
     int viewportX = m_viewSize.width() * scalePointFraction;
-    int offset = scalePointX - viewportX;
-    if ((offset + m_viewSize.width()) > totalTrackWidthInPixels())
-    {
-        offset = totalTrackWidthInPixels() - m_viewSize.width();
-    }
-    if (offset < 0)
-    {
-        offset = 0;
-    }
-    m_scrollContainer->setPos(-offset, 0);
+    setHorizontalScrollValue(scalePointX - viewportX);
 }
 
 float Scene::secondsPerPixel()
@@ -174,6 +166,51 @@ int Scene::sampleToPixelX(int sample)
     return qFloor(float(sample) / m_samplesPerPixel);
 }
 
+void Scene::setHorizontalScrollValue(int pixelOffset)
+{
+    if (pixelOffset > (totalTrackWidthInPixels() - m_viewSize.width()))
+    {
+        pixelOffset = totalTrackWidthInPixels() - m_viewSize.width();
+    }
+    if (pixelOffset < 0)
+    {
+        pixelOffset = 0;
+    }
+    m_scrollContainer->setPos(-pixelOffset, 0);
+
+    if (m_horizontalScrollBar != nullptr)
+    {
+        m_horizontalScrollBar->setValue(pixelOffset);
+    }
+}
+
+int Scene::horizontalScrollValue() const
+{
+    return -m_scrollContainer->pos().x();
+}
+
+void Scene::processMouseWheelEvent(QGraphicsSceneWheelEvent *event)
+{
+    if (event->modifiers() & Qt::ControlModifier)
+    {
+        int scalePoint = pixelXToSample(event->pos().x());
+        float multiplier = (qAbs(event->delta()) / 120.0) * 1.1;
+        if (event->delta() > 0)
+        {
+            setSecondsPerPixel(secondsPerPixel() / multiplier, scalePoint);
+        }
+        else
+        {
+            setSecondsPerPixel(secondsPerPixel() * multiplier, scalePoint);
+        }
+    }
+    if (event->modifiers() & Qt::ShiftModifier)
+    {
+        int offset = qFloor((event->delta() / 120.0) * (m_viewSize.width() / 10.0));
+        setHorizontalScrollValue(horizontalScrollValue() - offset);
+    }
+}
+
 void Scene::updateHorizontalScrollBarRange()
 {
     if (!m_horizontalScrollBar || !m_viewSize.isValid()) {
@@ -189,5 +226,5 @@ void Scene::horizontalScrollBarValueChanged()
     if (!m_horizontalScrollBar) {
         return;
     }
-    m_scrollContainer->setPos(-m_horizontalScrollBar->value(), 0);
+    setHorizontalScrollValue(m_horizontalScrollBar->value());
 }

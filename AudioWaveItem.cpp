@@ -262,17 +262,5 @@ void AudioWaveItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void AudioWaveItem::wheelEvent(QGraphicsSceneWheelEvent *event)
 {
-    if (event->modifiers() & Qt::ControlModifier)
-    {
-        int scalePoint = m_scene->pixelXToSample(event->pos().x());
-        float multiplier = (qAbs(event->delta()) / 120.0) * 1.1;
-        if (event->delta() > 0)
-        {
-            m_scene->setSecondsPerPixel(m_scene->secondsPerPixel() / multiplier, scalePoint);
-        }
-        else
-        {
-            m_scene->setSecondsPerPixel(m_scene->secondsPerPixel() * multiplier, scalePoint);
-        }
-    }
+    m_scene->processMouseWheelEvent(event);
 }
