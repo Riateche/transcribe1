@@ -194,15 +194,8 @@ void Scene::processMouseWheelEvent(QGraphicsSceneWheelEvent *event)
     if (event->modifiers() & Qt::ControlModifier)
     {
         int scalePoint = pixelXToSample(event->pos().x());
-        float multiplier = (qAbs(event->delta()) / 120.0) * 1.1;
-        if (event->delta() > 0)
-        {
-            setSecondsPerPixel(secondsPerPixel() / multiplier, scalePoint);
-        }
-        else
-        {
-            setSecondsPerPixel(secondsPerPixel() * multiplier, scalePoint);
-        }
+        float multiplier = qExp(-event->delta() * 0.005);
+        setSecondsPerPixel(secondsPerPixel() * multiplier, scalePoint);
     }
     if (event->modifiers() & Qt::ShiftModifier)
     {
